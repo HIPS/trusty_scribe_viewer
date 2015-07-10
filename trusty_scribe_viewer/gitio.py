@@ -46,3 +46,6 @@ def obj_from_tree(tree, path):
 
 def get_head_commit():
     return Commit(str(repo.head.target))
+
+def get_diff(commit_1, commit_2):
+    return repo.diff(commit_1.obj, commit_2.obj).patch

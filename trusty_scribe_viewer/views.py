@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 import gitio
-import sys
-import itertools
 from datetime import datetime
 
 def index(request):
@@ -47,7 +45,7 @@ notebook_entry_template = """\
 <h3>{timestamp} : {title}</h3>
 <p>{body}</p>
 <a href="/browse/{commit_id}/">Browse</a>
-<a href="/diffs/{prev_commit_id}/{commit_id}/">Diff</a>
+<a href="/diff/{prev_commit_id}/{commit_id}/">Diff</a>
 """
 
 notebook_footer_template = """\
@@ -89,3 +87,7 @@ dir_template = """\
 dir_entry_template = """\
 <li><a href="{0}">{0}</a></li>
 """
+
+def diff(request, sha_1, sha_2):
+    return HttpResponse(gitio.get_diff(gitio.Commit(sha_1), gitio.Commit(sha_2)),
+                        content_type='text/plain')
