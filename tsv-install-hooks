@@ -1,0 +1,5 @@
+#!/bin/bash
+fname=.git/hooks/prepare-commit-msg
+cp $(dirname $0)/git_hooks/prepare-commit-msg $fname
+chmod +x $fname
+echo "prepare-commit-msg copied to " $(readlink -m $fname)

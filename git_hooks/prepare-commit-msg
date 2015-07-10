@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+import os
+import sys
+import re
+import subprocess
+
+status = subprocess.check_output(['git', 'status', '-z']) # Machine-readable format
+status_lines = status.split('\x00')
+# regex for modified or new files
+p = re.compile(r'^[AM] +([a-zA-Z0-9/_.-]+)$')
+matches = filter(bool, map(p.match, status_lines))
+paths = [m.group(1) for m in matches]
+fnames = map(os.path.basename, paths)
+bullet_lines = ["# * [{fname}]({path})".format(path=path, fname=fname)
+                for path, fname in zip(paths, fnames)]
+bullets_string = "\n".join(bullet_lines)
+
+commit_file = sys.argv[1]
+with open(commit_file) as f: standard_message = f.read()
+
+message = """\
+
+
+{bullets_string}
+
+# Trusty Scribe commit message formatting:
+# Uncomment lines above to highlight notable files. All strings of the form
+# [..](..) will render as links. Those alone on a line starting with '*' will
+# also have their contents rendered. Be sure to leave a space after commit title
+# and before bullets.
+{standard_message}
+""".format(bullets_string=bullets_string,
+           standard_message=standard_message)
+
+with open(commit_file, 'w') as f:
+    f.write(message)
