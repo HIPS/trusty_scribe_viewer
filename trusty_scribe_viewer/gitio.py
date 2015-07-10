@@ -13,8 +13,11 @@ class Commit(object):
     @property
     def prev(self):
         walker = repo.walk(self.sha, pygit2.GIT_SORT_TIME)
-        walker.next()
-        return Commit(str(walker.next().id))
+        try:
+            walker.next()
+            return Commit(str(walker.next().id))
+        except StopIteration:
+            return None
 
     @property
     def timestamp(self):
