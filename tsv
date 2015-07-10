@@ -8,6 +8,6 @@ if __name__ == "__main__":
         repo_path = sys.argv[1]
     except IndexError:
         repo_path = '.'
-    os.environ.setdefault("REPOPATH", sys.argv[1])
+    os.environ.setdefault("REPOPATH", repo_path)
     from django.core.management import execute_from_command_line
     execute_from_command_line(['tsv', 'runserver'])
