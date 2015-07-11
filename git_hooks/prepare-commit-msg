@@ -4,6 +4,10 @@ import sys
 import re
 import subprocess
 
+if sys.argv[2]:
+    # Explicit flag passed (e.g. -m) or special commit like merge
+    sys.exit(0)
+
 status = subprocess.check_output(['git', 'status', '-z']) # Machine-readable format
 status_lines = status.split('\x00')
 # regex for modified or new files
