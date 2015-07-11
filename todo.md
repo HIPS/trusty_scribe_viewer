@@ -1,11 +1,8 @@
-# Git hooks
-* Make commit message template hook
-
 # Browser
+* Django templates
 * Implement markdown-style links in commit messages
 * Include images/text from links listed as standalone bullets
 * Some kind of css
-* Django templates
 
 # Distribution
 * setup.py stuff to install tsv

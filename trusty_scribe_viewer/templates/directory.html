@@ -1,0 +1,8 @@
+<!doctype html>
+<title>Directory {{ dirname }}</title>
+<h2>Contents of directory {{ dirname }} at commit {{ commit_id }}:</h2>
+<ul>
+{% for relpath in relpaths %}
+    <li><a href="{{ relpath }}">{{ relpath }}</a></li>
+{% endfor %}
+</ul>
