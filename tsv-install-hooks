@@ -3,3 +3,11 @@ fname=.git/hooks/prepare-commit-msg
 cp $(dirname $0)/git_hooks/prepare-commit-msg $fname
 chmod +x $fname
 echo "prepare-commit-msg copied to " $(readlink -m $fname)
+
+cat > .tsv_whitelist <<EOF
+# List unix-style file patterns for files you want to appear in commit messages
+# by default. For example:
+# *.png
+
+EOF
+echo "Created file" $(readlink -m .tsv_whitelist)

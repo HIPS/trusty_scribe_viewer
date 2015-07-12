@@ -1,0 +1,4 @@
+# List unix-style file patterns for files you want to appear in commit messages
+# by default. For example:
+# *.png
+

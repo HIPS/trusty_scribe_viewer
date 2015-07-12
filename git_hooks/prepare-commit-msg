@@ -3,22 +3,47 @@ import os
 import sys
 import re
 import subprocess
+from fnmatch import fnmatch
 
 if len(sys.argv) > 2:
     # Explicit flag passed (e.g. -m) or special commit like merge
     sys.exit(0)
 
+# Obtain whitelist
+git_dir = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).splitlines()[0]
+whitelist_file = os.path.join(git_dir, '.tsv_whitelist')
+print "git dir", git_dir
+print "whitelist file", whitelist_file
+if os.path.isfile(whitelist_file):
+    print "got here"
+    not_a_comment_or_empty = lambda line : line and line[0] != '#'
+    with open(whitelist_file) as f:
+        whitelist_patterns = filter(not_a_comment_or_empty, f.read().splitlines())
+else:
+    whitelist_patterns = []
+print whitelist_patterns
+
+# Get names of new/modified files
 status = subprocess.check_output(['git', 'status', '-z']) # Machine-readable format
 status_lines = status.split('\x00')
 # regex for modified or new files
-p = re.compile(r'^[AM] +([a-zA-Z0-9/_.-]+)$')
+p = re.compile(r'^[AM][AM]? +([a-zA-Z0-9/_.-]+)$')
 matches = filter(bool, map(p.match, status_lines))
 paths = [m.group(1) for m in matches]
 fnames = map(os.path.basename, paths)
-bullet_lines = ["# * [{fname}]({path})".format(path=path, fname=fname)
-                for path, fname in zip(paths, fnames)]
+paths_and_fnames = zip(paths, fnames)
+
+# Build the list of bullets
+whitelisted     = lambda p_f : any([fnmatch(p_f[1], pattern) for pattern in whitelist_patterns])
+not_whitelisted = lambda p_f : not whitelisted(p_f)
+bullet_lines = (["* [{fname}]({path})".format(path=path, fname=fname)
+                for path, fname in filter(whitelisted, paths_and_fnames)]
+                +
+                ["# * [{fname}]({path})".format(path=path, fname=fname)
+                for path, fname in filter(not_whitelisted, paths_and_fnames)])
 bullets_string = "\n".join(bullet_lines)
 
+# Write out default commit message
 commit_file = sys.argv[1]
 with open(commit_file) as f: standard_message = f.read()
 
