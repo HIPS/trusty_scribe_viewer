@@ -4,34 +4,33 @@
 {% endblock %}
 
 {% block content %}
-  <h3>{{ commit_title }}</h3>
+  <h3>{{ commit.title }}</h3>
   <table>
-    <tr><td>Committer</td>   <td>{{ commiter }}</td></tr>
-    <tr><td>Timestamp</td>   <td>{{ timestamp }}</td></tr>
-    <tr><td>SHA</td>         <td>{{ commit_id }}</td></tr>
+    <tr><td>Author</td>      <td>{{ commit.author }}</td></tr>
+    <tr><td>Timestamp</td>   <td>{{ commit.timestamp }}</td></tr>
+    <tr>
+      <td>SHA</td>
+      <td><a href="/commit/{{ commit.sha }}/">{{ commit.sha }}</a></td>
+    </tr>
     <tr>
       <td>Parents</td>
       <td>
-	{% for parent in parents %}
-	  <p>
-	    <a href="/commit/{{ parent.commit_id }}/">{{ parent.commit_id }}</a>
-	    <a href="/diff/{{ parent.commit_id }}/{{ commit_id }}/">(Diff)</a>
-	  </p>
+	{% for parent in commit.parents %}
+	  <a href="/commit/{{ parent.sha }}/">{{ parent.sha }}</a>
+	  <a href="/diff/{{ parent.sha }}/{{ commit.sha }}/">(Diff)</a>
+          <br>
 	{% endfor %}
       </td>
     </tr>
     <tr>
       <td>
-	<p>Updated files</p>
-	<p><a href="/browse/{{ commit_id }}/">(browse full tree)</a></p>
+	Updated files
       </td>
       <td>
-	{% for file in changed_files %}
-	  <p>
-	    <a href="/commit/{{ parent.commit_id }}/">{{ parent.commit_id }}</a>
-	    <a href="/diff/{{ parent.commit_id }}/{{ commit_id }}/">(Diff)</a>
-	  </p>
+	{% for file_path in commit.updated_files %}
+	  <a href="/browse/{{ commit.sha }}/{{ file_path }}/">{{ file_path }}</a><br>
 	{% endfor %}
+	<a href="/browse/{{ commit.sha }}/">(browse full tree)</a>
       </td>
     </tr>
   </table>

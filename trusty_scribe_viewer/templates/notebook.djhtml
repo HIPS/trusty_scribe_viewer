@@ -6,9 +6,11 @@
 
 {% block content %}
   <h1>Lab Notebook for {{ repo_name }}</h1>
-  {% for commit in commit_list %}
-    <h3><a href="/commit/{{ commit.commit_id }}/">{{ commit.title }}</a></h3>
-    <p>{{ commit.content }}</p>
+  {% for commit in commits %}
+    <h3><a href="/commit/{{ commit.sha }}/">{{ commit.title }}</a></h3>
+    <div>{{ commit.rendered_content }}</div>
   {% endfor %}
-  <a href="/lab_notebook/">Show all</a>
+  {% if max_entries %}  
+    <a href="/lab_notebook/">Show all</a>
+  {% endif %}
 {% endblock %}

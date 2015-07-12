@@ -9,17 +9,15 @@ a:link {
     color : #338;
     text-decoration : none;
 }
-
 a:visited {
     color : #338;
     text-decoration : none;
 }
-
 a:hover {
     text-decoration : underline;
 }
-
 body {
+    font-family : sans-serif;
     margin : 40px auto;
     max-width : 650px;
     line-height : 1.6;
@@ -38,6 +36,14 @@ pre {
     display: block;
     padding: 0.5em 1em;
     background: #eee;
+    width: 100%;
+}
+table {
+    border-spacing: 0;
+}
+td {
+    vertical-align : top;
+    padding : 0px 30px 0px 0px;
 }
 	</style>
     </head>
