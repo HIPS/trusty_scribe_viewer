@@ -23,7 +23,7 @@
     <tr>
       <td>
 	<p>Updated files</p>
-	<p><a href="/browse/{{ commit_id }}/">browse full tree</a></p>
+	<p><a href="/browse/{{ commit_id }}/">(browse full tree)</a></p>
       </td>
       <td>
 	{% for file in changed_files %}

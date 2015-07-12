@@ -5,6 +5,20 @@
         <title>{% block title %}(No title){% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">
+a:link {
+    color : #338;
+    text-decoration : none;
+}
+
+a:visited {
+    color : #338;
+    text-decoration : none;
+}
+
+a:hover {
+    text-decoration : underline;
+}
+
 body {
     margin : 40px auto;
     max-width : 650px;
