@@ -38,7 +38,7 @@ whitelisted     = lambda p_f : any([fnmatch(p_f[1], pattern) for pattern in whit
 not_whitelisted = lambda p_f : not whitelisted(p_f)
 bullet_lines = (["* [{fname}]({path})".format(path=path, fname=fname)
                 for path, fname in filter(whitelisted, paths_and_fnames)]
-                +
+                + [""] +
                 ["# * [{fname}]({path})".format(path=path, fname=fname)
                 for path, fname in filter(not_whitelisted, paths_and_fnames)])
 bullets_string = "\n".join(bullet_lines)
