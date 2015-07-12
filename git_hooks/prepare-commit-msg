@@ -4,7 +4,7 @@ import sys
 import re
 import subprocess
 
-if sys.argv[2]:
+if len(sys.argv) > 2:
     # Explicit flag passed (e.g. -m) or special commit like merge
     sys.exit(0)
 

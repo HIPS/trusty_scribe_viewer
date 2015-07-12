@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
+from django.template import Context, loader
+from django.utils.html import format_html
 import gitio
+import operator
+import re
 from datetime import datetime
 
 def index(request):
@@ -10,24 +14,80 @@ def lab_notebook(request, max_entries=None):
     commit_list = []
     commit = gitio.get_head_commit()
     remaining = int(max_entries) if max_entries else -1
-    while True:
-        message_lines = commit.message.splitlines()
-        title = message_lines[0]
-        body = "\n".join(message_lines[1:])
-        commit_list.append({'title'         : title,
-                            'commit_id'     : commit.sha,
-                            'timestamp'     : format_time(commit.timestamp),
-                            'prev_commit_id': 0,
-                            'body'          : body})
+    while commit and remaining != 0:
+        title, body = split_once(parbreak_re, commit.message)
+        prev_commit = commit.prev
+        commit_list.append({'title'           : title,
+                            'commit_id'       : commit.sha,
+                            'timestamp'       : format_time(commit.timestamp),
+                            'prev_commit_id'  : prev_commit.sha if prev_commit else 0,
+                            'content'         : body_as_html(commit.sha, body)})
+        commit = prev_commit
         remaining -= 1
-        commit = commit.prev
-        if commit is None or remaining == 0: break
-        # Note: 'prev' commit based on timestamp. May not actually be a parent.
-        commit_list[-1]['prev_commit_id'] = commit.sha
 
     context = {'repo_name'   : gitio.repo_name,
                'commit_list' : commit_list}
     return render(request, 'notebook.html', context)
+
+def split_once(p, s):
+    ans = p.split(s, 1)
+    if len(ans) == 1:
+        return ans[0], ""
+    else:
+        return ans[0], ans[1]
+
+link_re_expr = r'\[(?P<name>[\w./-]+)\]\((?P<path>[\w./-]+)\)'
+link_re = re.compile(link_re_expr)
+bullet_link_re = re.compile(r'\* ' + link_re_expr)
+parbreak_re = re.compile('\n\n+')
+
+def body_as_html(commit_id, md_text):
+    def paragraph_to_html(paragraph):
+        nonempty_lines = filter(bool, paragraph.split("\n"))
+        bullet_matches = map(bullet_link_re.match, nonempty_lines)
+        if all(bullet_matches):
+            return concat_html(map(bullet_match_to_html, bullet_matches))
+        else:
+            pieces = link_re.split(paragraph)
+            text, rest = pieces[0], pieces[1:]
+            html = format_html("{0}", text)
+            while rest:
+                (name, path, text), rest = rest[:3], rest[3:]
+                html += format_html('{link}{text}',
+                                    text = text,
+                                    link = link_html(name, path, commit_id))
+            return format_html("<p>{0}</p>", html)
+
+    def bullet_match_to_html(match):
+        name, path = match.group('name'), match.group('path')
+        return format_html("<p>{link}</p><p>{content}</p>",
+                           link = link_html(name, path, commit_id),
+                           content = content_html(path, commit_id))
+
+    return concat_html(map(paragraph_to_html, parbreak_re.split(md_text)))
+
+def concat_html(html_list):
+    return reduce(operator.add, html_list, format_html(""))
+
+def link_html(name, path, commit_id):
+    return format_html('<a href="{full_path}">{name}</a>',
+                       name=name,
+                       full_path=path_to_file(commit_id, path))
+
+def path_to_file(commit_id, path):
+    return "/browse/{commit_id}/{path}".format(commit_id=commit_id, path=path)
+
+image_patterns = re.compile(r'.png$|.jpg$')
+def content_html(path, commit_id):
+    if image_patterns.search(path):
+        return format_html('<img src="{0}" width="600">',
+                           path_to_file(commit_id, path))
+    else:
+        N_lines_shown = 10
+        path_list = filter(bool, path.split('/'))
+        obj, obj_type = gitio.Commit(commit_id).obj_from_path(path_list)
+        text_kept = "\n".join(str(obj).splitlines()[-N_lines_shown:])
+        return format_html("<pre><code>{0}</code></pre>", text_kept)
 
 def format_time(t):
     return datetime.fromtimestamp(t).strftime('%m-%d %H:%M')

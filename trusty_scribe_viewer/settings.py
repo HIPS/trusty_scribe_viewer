@@ -8,6 +8,6 @@ INSTALLED_APPS = ()
 MIDDLEWARE_CLASSES = ()
 ROOT_URLCONF = 'trusty_scribe_viewer.urls'
 TEMPLATES = [{'BACKEND' : 'django.template.backends.django.DjangoTemplates',
-              'DIRS' : ['trusty_scribe_viewer/templates']}]
+              'DIRS' : [os.path.join(BASE_DIR, 'trusty_scribe_viewer/templates')]}]
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
