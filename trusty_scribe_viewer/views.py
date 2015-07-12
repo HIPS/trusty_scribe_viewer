@@ -80,7 +80,7 @@ def path_to_file(commit_id, path):
 image_patterns = re.compile(r'.png$|.jpg$')
 def content_html(path, commit_id):
     if image_patterns.search(path):
-        return format_html('<img src="{0}" width="600">',
+        return format_html('<img src="{0}">',
                            path_to_file(commit_id, path))
     else:
         N_lines_shown = 10

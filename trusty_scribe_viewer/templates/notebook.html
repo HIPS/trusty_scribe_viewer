@@ -1,12 +1,16 @@
-<!doctype html>
-<title>Lab Notebook</title>
-<h1>Lab Notebook for {{ repo_name }}:</h1> <p>
+{% extends "base.html" %}
+
+{% block title %}
+Lab Notebook
+{% endblock %}
+
+{% block content %}
+<h1>Lab Notebook for {{ repo_name }}:</h1>
 {% for commit in commit_list %}
     <h3>{{ commit.timestamp }} : {{ commit.title }}</h3>
     <a href="/browse/{{ commit.commit_id }}/">Browse</a>
     <a href="/diff/{{ commit.prev_commit_id }}/{{ commit.commit_id }}/">Diff</a>
     {{ commit.content }}
 {% endfor %}
-</p>
-    <a href="/lab_notebook/">Show all</a>
-</p>
+<a href="/lab_notebook/">Show all</a>
+{% endblock %}
