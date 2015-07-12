@@ -10,24 +10,38 @@ from datetime import datetime
 def index(request):
     return HttpResponseRedirect("/lab_notebook/50/")
 
+def commit(request, sha):
+    print "the sha is", sha
+    commit = gitio.Commit(sha)
+    title, body = split_once(parbreak_re, commit.message)
+    parents = []
+    changed_files = []
+    commiter = '(commiter)'
+    commit_info = {'commiter'        : commiter,
+                   'commit_title'    : title,
+                   'commit_id'       : commit.sha,
+                   'timestamp'       : format_time(commit.timestamp),
+                   'parents'         : parents,
+                   'commit_content'  : body_as_html(commit.sha, body),
+                   'changed_files'   : changed_files}
+    return render(request, 'commit.djhtml', commit_info)
+
 def lab_notebook(request, max_entries=None):
     commit_list = []
     commit = gitio.get_head_commit()
     remaining = int(max_entries) if max_entries else -1
     while commit and remaining != 0:
         title, body = split_once(parbreak_re, commit.message)
-        prev_commit = commit.prev
         commit_list.append({'title'           : title,
                             'commit_id'       : commit.sha,
                             'timestamp'       : format_time(commit.timestamp),
-                            'prev_commit_id'  : prev_commit.sha if prev_commit else 0,
                             'content'         : body_as_html(commit.sha, body)})
-        commit = prev_commit
+        commit = commit.prev
         remaining -= 1
 
     context = {'repo_name'   : gitio.repo_name,
                'commit_list' : commit_list}
-    return render(request, 'notebook.html', context)
+    return render(request, 'notebook.djhtml', context)
 
 def split_once(p, s):
     ans = p.split(s, 1)
@@ -90,7 +104,7 @@ def content_html(path, commit_id):
         return format_html("<pre><code>{0}</code></pre>", text_kept)
 
 def format_time(t):
-    return datetime.fromtimestamp(t).strftime('%m-%d %H:%M')
+    return datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M')
 
 def browse(request, path_string):
     commit_id_and_path = filter(bool, path_string.split('/'))
@@ -102,7 +116,7 @@ def browse(request, path_string):
             context = {'dirname'   : "/".join(path) + "/",
                        'commit_id' : commit_id[:10],
                        'relpaths'  : obj + [".."]}
-            return render(request, 'directory.html', context)
+            return render(request, 'directory.djhtml', context)
         else:
             url_with_trailing_slash = "/browse/{0}/".format(path_string)
             return HttpResponseRedirect(url_with_trailing_slash)

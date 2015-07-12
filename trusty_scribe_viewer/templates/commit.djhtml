@@ -1,0 +1,42 @@
+{% extends "base.djhtml" %}
+{% block title %}
+  Commit {{ commit_id }}
+{% endblock %}
+
+{% block content %}
+  <h3>{{ commit_title }}</h3>
+  <table>
+    <tr><td>Committer</td>   <td>{{ commiter }}</td></tr>
+    <tr><td>Timestamp</td>   <td>{{ timestamp }}</td></tr>
+    <tr><td>SHA</td>         <td>{{ commit_id }}</td></tr>
+    <tr>
+      <td>Parents</td>
+      <td>
+	{% for parent in parents %}
+	  <p>
+	    <a href="/commit/{{ parent.commit_id }}/">{{ parent.commit_id }}</a>
+	    <a href="/diff/{{ parent.commit_id }}/{{ commit_id }}/">(Diff)</a>
+	  </p>
+	{% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<p>Updated files</p>
+	<p><a href="/browse/{{ commit_id }}/">browse full tree</a></p>
+      </td>
+      <td>
+	{% for file in changed_files %}
+	  <p>
+	    <a href="/commit/{{ parent.commit_id }}/">{{ parent.commit_id }}</a>
+	    <a href="/diff/{{ parent.commit_id }}/{{ commit_id }}/">(Diff)</a>
+	  </p>
+	{% endfor %}
+      </td>
+    </tr>
+  </table>
+  <hr>
+
+  {{ commit_content }}
+
+{% endblock %}
