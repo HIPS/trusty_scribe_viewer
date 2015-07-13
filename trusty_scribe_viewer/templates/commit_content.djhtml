@@ -1,0 +1,22 @@
+{% for paragraph in paragraphs %}
+  <p>
+    {% if paragraph.type == 'prose' %}
+      {% for element in paragraph.elements %}
+	{% if element.type == 'text' %}
+	  {{ element.text }}
+	{% elif element.type == 'link' %}
+	  <a href="/browse/{{ sha }}/{{ element.path }}/">{{ element.name }}</a>
+	{% endif %}
+      {% endfor %}
+    {% elif paragraph.type == 'bullet_links' %}
+      {% for link in paragraph.elements %}
+	{% if link.type == 'image' %}
+	  <img src="/browse/{{ sha }}/{{ link.path }}">
+	{% else %}
+	  <a href="/browse/{{ sha }}/{{ link.path }}/">{{ link.name }}</a><br>
+	  <pre><code>{{ link.contents }}</code></pre>
+	{% endif %}
+      {% endfor %}
+    {% endif %}
+  </p>
+{% endfor %}

@@ -36,6 +36,6 @@
   </table>
   <hr>
 
-  {{ commit_content }}
+  {{ commit.rendered_content }}
 
 {% endblock %}
